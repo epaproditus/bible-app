@@ -2,9 +2,9 @@
 //  VerticalSplit.swift
 //  VerticalSplit
 //
-//  A simplified draggable-divider container adapted from Doit's
-//  VerticalSplit component. Provides 3 snap detents for a
-//  top/bottom pane layout.
+//  A draggable-divider container ported from Doit's VerticalSplit component.
+//  Provides 3 snap detents with smooth animation, floating-pane appearance,
+//  black gap divider, and background dimming.
 //
 //  Detents (top pane fraction):
 //    .topFull            — 1.0  (bottom collapsed)
@@ -22,13 +22,17 @@ private let spacing: CGFloat = 36
 
 /// Minimum visual height for either pane before collapse logic kicks in.
 private let lil: CGFloat = 58
+private let lil2: CGFloat = 58 * 3 / 2
+private let lil3: CGFloat = 58 * 2
 
-/// Three snap positions (0, 1, 2) mapped to the three detents in order.
-private let notchCount: Int = 2  // 0-based → 3 positions
+/// Number of snap notches (0-based → notchCount+1 positions).
+private let notches: Int = 2   // 0, 1, 2 → 3 detents
 
-/// Haptic generators (lazy to avoid early allocation).
-private let lightHaptic = UIImpactFeedbackGenerator(style: .light)
-private let rigidHaptic = UIImpactFeedbackGenerator(style: .rigid)
+/// Haptic generators.
+private let lightImpact = UIImpactFeedbackGenerator(style: .light)
+private let heavyImpact = UIImpactFeedbackGenerator(style: .heavy)
+private let mediumImpact = UIImpactFeedbackGenerator(style: .medium)
+private let rigidImpact = UIImpactFeedbackGenerator(style: .rigid)
 
 // MARK: - VerticalSplit
 
@@ -44,8 +48,6 @@ public struct VerticalSplit<TopView: View, BottomView: View>: View {
 
     /// Background tint for both pane surfaces.
     var bgColor: Color = Color(.systemBackground)
-    /// Handle/pill foreground colour.
-    var handleFg: Color = .primary
 
     // ── Gesture state ──
 
@@ -62,6 +64,11 @@ public struct VerticalSplit<TopView: View, BottomView: View>: View {
 
     @State var overscroll: CGFloat = 0
     @State var translationBeforeOverscroll: CGFloat = 0
+    @State var initialMinimal = false
+    @State var initialTop: Bool = false
+
+    /// Extra offset when there's no bottom safe area (e.g. older devices).
+    let bottomExtraOffset: CGFloat = SafeAreaInsetsKey.defaultValue.bottom == 0 ? 16 : 0
 
     // ── Derived geometry ──
 
@@ -89,33 +96,36 @@ public struct VerticalSplit<TopView: View, BottomView: View>: View {
 
     // MARK: - Gesture
 
-    private var dragGesture: some Gesture {
+    private var bossGesture: some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .global)
             .updating($isDragging) { _, s, _ in s = true }
             .onChanged { value in
                 if initialPartition == nil {
                     initialPartition = partition
                     if hideTop || hideBottom {
-                        rigidHaptic.impactOccurred(intensity: 0.6)
+                        initialMinimal = true
+                        initialTop = hideTop
+                        mediumImpact.impactOccurred(intensity: 0.6)
                     }
                 }
 
                 withTransaction(transaction) {
                     let translation = (initialPartition ?? 0) + value.translation.height
+                    let minimalAdjustment = (initialMinimal ? (initialTop ? 8 - lil : lil - 8 - bottomExtraOffset) : 0)
                     let newPartition = min(cardHeight - lil,
-                                           max(-cardHeight + lil, translation))
+                                           max(-cardHeight + lil, translation + minimalAdjustment))
 
                     // Overscroll buffer for collapsing
                     if translation < -cardHeight + lil {
                         if translationBeforeOverscroll == 0 {
                             translationBeforeOverscroll = translation
-                            rigidHaptic.impactOccurred(intensity: 0.8)
+                            mediumImpact.impactOccurred(intensity: 0.8)
                         }
                         overscroll = (translation - translationBeforeOverscroll) * 0.75
                     } else if translation > cardHeight - lil {
                         if translationBeforeOverscroll == 0 {
                             translationBeforeOverscroll = translation
-                            rigidHaptic.impactOccurred(intensity: 0.8)
+                            mediumImpact.impactOccurred(intensity: 0.8)
                         }
                         overscroll = (translation - translationBeforeOverscroll) * 0.75
                     } else {
@@ -126,140 +136,239 @@ public struct VerticalSplit<TopView: View, BottomView: View>: View {
                     hideTop = false
                     hideBottom = false
                     topHeight = cardHeight + newPartition
-                    let old = partition
+                    let oldPartition = partition
                     partition = newPartition
                     notchPartition = snapPartition(for: notchIndex(for: newPartition))
 
-                    if (old < notchPartition && notchPartition < partition) ||
-                       (old > notchPartition && notchPartition > partition) {
-                        rigidHaptic.impactOccurred(intensity: 0.5)
+                    if (oldPartition < notchPartition && notchPartition < partition) ||
+                        (oldPartition > notchPartition && notchPartition > partition) {
+                        rigidImpact.impactOccurred(intensity: 0.5)
                     }
                 }
             }
             .onEnded { value in
-                let translation = (initialPartition ?? 0) + value.translation.height
-                var newPartition: CGFloat
-                var newDetent: SplitDetent
-
-                // Collapse zones (near edges)
-                if translation < -cardHeight + lil / 2 {
-                    newPartition = -(cardHeight - lil)
-                    newDetent = .topFull
-                    hideTop = false
-                    hideBottom = true
-                } else if translation > cardHeight - lil / 2 {
-                    newPartition = cardHeight - lil
-                    newDetent = .topFull
-                    hideTop = true
-                    hideBottom = false
-                } else {
-                    // Snap to nearest notch
-                    let idx = notchIndex(for: translation)
-                    newPartition = snapPartition(for: idx)
-                    newDetent = detentForNotch(idx)
-                    hideTop = false
-                    hideBottom = false
+                if value.translation.height < 2, initialMinimal {
+                    let expandingFromCollapsedTop = initialTop
+                    let targetSplit = expandingFromCollapsedTop
+                        ? collapsedTopTapDetent
+                        : collapsedTapDetent
+                    withTransaction(transaction) {
+                        hideTop = false
+                        hideBottom = false
+                        overscroll = 0
+                        translationBeforeOverscroll = 0
+                        applyDetent(targetSplit)
+                    }
+                    initialPartition = nil
+                    initialMinimal = false
+                    initialTop = false
+                    detent = targetSplit
+                    return
                 }
 
-                // Overscroll → full-screen collapse
+                let translation = (initialPartition ?? 0) + value.translation.height
+                let minimalAdjustment = (initialMinimal ? (initialTop ? 8 - lil : lil - 8 - bottomExtraOffset) : 0)
+                var newPartition = translation + minimalAdjustment
+                var newDetent: SplitDetent
+
+                if newPartition < -cardHeight + lil2 {
+                    newPartition = lil - cardHeight
+                    newDetent = .bottomFull   // top fully collapsed
+                } else if newPartition < -cardHeight + lil3 {
+                    newPartition = lil3 - cardHeight
+                    newDetent = .fraction(0)
+                } else if newPartition > cardHeight - lil2 {
+                    newPartition = cardHeight - lil
+                    newDetent = .topFull
+                } else if newPartition > cardHeight - lil3 {
+                    newPartition = cardHeight - lil3
+                    newDetent = .fraction(1)
+                } else {
+                    let notch = notchIndex(for: newPartition)
+                    newDetent = detentForNotch(notch)
+                    newPartition = snapPartition(for: notch)
+                }
+
                 withTransaction(transaction) {
+                    if initialMinimal && (hideTop || hideBottom) {
+                        overscroll = 0
+                        return
+                    }
+                    partition = newPartition
+                    topHeight = cardHeight + newPartition
                     if overscroll < -20 {
                         hideTop = false
                         hideBottom = true
                         newDetent = .topFull
-                        newPartition = -(cardHeight - lil)
-                        rigidHaptic.impactOccurred(intensity: 0.6)
+                        partition = -(cardHeight - lil)
+                        mediumImpact.impactOccurred(intensity: 0.6)
                     } else if overscroll > 20 {
                         hideTop = true
                         hideBottom = false
-                        newDetent = .topFull
-                        newPartition = cardHeight - lil
-                        rigidHaptic.impactOccurred(intensity: 0.6)
+                        newDetent = .bottomFull
+                        partition = cardHeight - lil
+                        mediumImpact.impactOccurred(intensity: 0.6)
                     } else {
-                        partition = newPartition
-                        topHeight = cardHeight + newPartition
-                        rigidHaptic.impactOccurred(intensity: 0.6)
+                        hideTop = false
+                        hideBottom = false
+                        rigidImpact.impactOccurred(intensity: 0.6)
                     }
-
                     overscroll = 0
                     translationBeforeOverscroll = 0
                 }
 
                 initialPartition = nil
+                initialMinimal = hideTop || hideBottom
+                initialTop = false
                 detent = newDetent
             }
     }
 
+    /// Detent when user taps the collapsed pill (bottom was collapsed → expand to 50/50).
+    private var collapsedTapDetent: SplitDetent = .footnotesExpanded
+
+    /// Detent when user taps the collapsed pill (top was collapsed → expand to 50/50).
+    private var collapsedTopTapDetent: SplitDetent = .footnotesExpanded
+
     // MARK: - Body
 
     public var body: some View {
-        let isMinimal = hideTop || hideBottom
+        let isMinimalPill: Bool = hideTop || hideBottom
 
         ZStack {
             // ── Panes ──
             VStack(spacing: spacing) {
                 if !hideTop {
-                    topView()
-                        .frame(height: topHeight)
-                        .clipped()
-                        .transition(.offset(y: -topHeight - 300))
+                    TopWrapper(
+                        minimise: min(lil3, topHeight) / lil,
+                        overscroll: overscroll,
+                        isFull: hideBottom,
+                        bgColor: bgColor,
+                        content: topView,
+                        overlay: {
+                            Text(topTitle)
+                                .padding(.horizontal)
+                                .fontWeight(.semibold)
+                        }
+                    )
+                    .frame(height: hideBottom ? nil : topHeight + overscroll / 5)
+                    .transaction(value: hideBottom, { t in
+                        t.animation = didSetInitialSplit ? .smooth(duration: 0.4) : .none
+                    })
+                    .transition(.offset(y: -topHeight - (partition > 0 ? 300 : 200)))
+                    .zIndex(1)
                 }
                 if !hideBottom {
-                    bottomView()
-                        .frame(maxHeight: hideTop ? .infinity : cardHeight - partition)
-                        .clipped()
-                        .transition(.offset(y: partition + range + (partition < 0 ? 300 : 200)))
+                    BottomWrapper(
+                        minimise: 1 - max(0, partition - cardHeight + lil3) / lil,
+                        overscroll: overscroll,
+                        isFull: hideTop,
+                        bgColor: bgColor,
+                        content: bottomView,
+                        overlay: {
+                            Text(bottomTitle)
+                                .padding(.horizontal)
+                                .fontWeight(.semibold)
+                        }
+                    )
+                    .transaction(value: hideTop, { t in
+                        t.animation = didSetInitialSplit ? .smooth(duration: 0.4) : .none
+                    })
+                    .transition(.offset(y: -partition + range + (partition < 0 ? 300 : 200)))
+                    .zIndex(1)
                 }
             }
             .animation(.smooth(duration: 0.45), value: hideTop)
             .animation(.smooth(duration: 0.45), value: hideBottom)
             .zIndex(1)
 
-            // ── Drag-pill background track ──
-            Capsule()
-                .fill(bgColor)
-                .frame(height: spacing)
-                .frame(maxWidth: .infinity)
-                .shadow(color: .black.opacity(0.15), radius: 4, y: 2)
-                .overlay {
-                    // Grabber nub
-                    Capsule()
-                        .fill(.secondary.opacity(0.5))
-                        .frame(width: 48, height: 5)
-                }
-                .offset(y: handleOffsetY)
-                .gesture(dragGesture)
-                .zIndex(10)
-
-            // ── Collapsed title pill ──
-            if isMinimal {
-                HStack(spacing: 8) {
-                    Text(hideTop ? topTitle : bottomTitle)
-                        .fontWeight(.medium)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .foregroundStyle(handleFg)
-
-                    Image(systemName: "chevron.up.chevron.down")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.horizontal, 16)
-                .frame(height: 44)
-                .background {
-                    Capsule().fill(.regularMaterial)
-                }
-                .shadow(color: .black.opacity(0.12), radius: 3, y: 1)
-                .offset(y: handleOffsetY)
-                .onTapGesture {
-                    // Tap collapsed pill → go to .footnotesExpanded
-                    withTransaction(transaction) {
-                        detent = .footnotesExpanded
-                        applyDetent(.footnotesExpanded)
-                    }
-                }
-                .zIndex(11)
+            // ── Background dimming (bottom pane expanded) ──
+            if !hideBottom && !hideTop && partition > 0 {
+                Color.black.opacity(0.3 * (partition / range))
+                    .ignoresSafeArea()
+                    .animation(.smooth(duration: 0.4), value: partition)
+                    .zIndex(2)
+                    .allowsHitTesting(false)
             }
+
+            // ── Handle pill background (black gap) ──
+            HStack(spacing: 8) {
+                Spacer()
+                    .frame(width: 0)  // placeholder for leading accessories
+
+                Text(isMinimalPill ? (hideTop ? topTitle : bottomTitle) : "")
+                    .fontWeight(.medium)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(maxWidth: isMinimalPill ? 220 : .infinity)
+                    .fixedSize(horizontal: true, vertical: false)
+                    .padding(.horizontal, 8)
+                    .opacity(0)
+                    .foregroundStyle(.primary)
+
+                Spacer()
+                    .frame(width: 0)  // placeholder for trailing accessories
+            }
+            .padding(.horizontal, 12)
+            .frame(height: isMinimalPill ? 44 : spacing)
+            .frame(maxWidth: isMinimalPill ? nil : .infinity)
+            .background(
+                Capsule().fill(
+                    isMinimalPill
+                        ? Color(.systemGray6)
+                        : Color(.separator).opacity(0.3)
+                )
+            )
+            .offset(y: handleOffsetY)
+            .zIndex(10)
+
+            // ── Handle pill content ──
+            HStack(spacing: 8) {
+                // Invisible width-anchor for title in collapsed mode
+                Text(isMinimalPill ? (hideTop ? topTitle : bottomTitle) : "")
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(maxWidth: 220)
+                    .fixedSize(horizontal: true, vertical: false)
+                    .padding(.horizontal, 8)
+                    .opacity(0)
+                    .frame(maxWidth: isMinimalPill ? nil : .infinity)
+            }
+            .foregroundStyle(.primary)
+            .padding(.horizontal, isMinimalPill ? 12 : 24 + abs(overscroll / 20))
+            .frame(height: isMinimalPill ? 44 : spacing)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .contentShape(.rect)
+            .offset(y: handleOffsetY)
+            .gesture(bossGesture)
+            .zIndex(11)
+
+            // ── Grabber nub ──
+            ZStack {
+                Capsule()
+                    .fill(.secondary.opacity(0.4))
+                    .frame(width: 56, height: 5)
+                    .transaction({ t in
+                        t.animation = .easeInOut(duration: 0.3)
+                    }, body: { $0.scaleEffect(isDragging ? 0.9 : 1) })
+                    .blur(radius: isMinimalPill ? 8 : 0)
+                    .opacity(isMinimalPill ? 0 : 1)
+
+                // Collapsed pill title
+                Text(isMinimalPill ? (hideTop ? topTitle : bottomTitle) : "")
+                    .fontWeight(.medium)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(maxWidth: 220)
+                    .fixedSize(horizontal: true, vertical: false)
+                    .scaleEffect(isMinimalPill ? 1 : 0.9)
+                    .blur(radius: isMinimalPill ? 0 : 12)
+                    .opacity(isMinimalPill ? 1 : 0)
+                    .foregroundStyle(.primary)
+            }
+            .offset(y: handleOffsetY)
+            .zIndex(12)
+            .allowsHitTesting(false)
         }
         .background(Color(.systemBackground))
         .onAppear {
@@ -280,20 +389,20 @@ public struct VerticalSplit<TopView: View, BottomView: View>: View {
     // MARK: - Helpers
 
     private var handleOffsetY: CGFloat {
-        (hideTop ? -lil + 8 : hideBottom ? lil - 8 : 0)
+        (hideTop ? -lil + 8 : hideBottom ? lil - 8 - bottomExtraOffset : 0)
             + (partition + overscroll / (hideTop || hideBottom ? 1 : 5))
     }
 
     /// Map a partition offset to the nearest notch index (0, 1, or 2).
     private func notchIndex(for partition: CGFloat) -> Int {
         let clamped = min(range, max(-range, partition))
-        let progress = (clamped + range) / (range * 2) // 0…1
-        return Int(round(progress * CGFloat(notchCount)))
+        let progress = (clamped + range) / (range * 2)  // 0…1
+        return Int(round(progress * CGFloat(notches)))
     }
 
     /// Partition offset for a given notch index.
     private func snapPartition(for notch: Int) -> CGFloat {
-        let p = CGFloat(notch) / CGFloat(notchCount) * range * 2 - range
+        let p = CGFloat(notch) / CGFloat(notches) * range * 2 - range
         return p
     }
 
@@ -313,12 +422,26 @@ public struct VerticalSplit<TopView: View, BottomView: View>: View {
         case .topFull:
             hideBottom = true
             partition = cardHeight - lil
+        case .bottomFull:
+            hideTop = true
+            partition = -cardHeight + lil
         case .footnotesExpanded:
             let idx = 1
             partition = snapPartition(for: idx)
         case .footnotesFull:
             let idx = 0
             partition = snapPartition(for: idx)
+        case .fraction(let value):
+            if value <= 0 {
+                hideTop = true
+                partition = -cardHeight + lil
+            } else if value >= 1 {
+                hideBottom = true
+                partition = cardHeight - lil
+            } else {
+                let notch = Int(round(CGFloat(notches) * value))
+                partition = snapPartition(for: notch)
+            }
         }
         topHeight = cardHeight + partition
     }
@@ -344,23 +467,5 @@ public struct VerticalSplit<TopView: View, BottomView: View>: View {
         self.bottomTitle = bottomTitle
         self.topView = topView
         self.bottomView = bottomView
-    }
-}
-
-// MARK: - Modifiers
-
-public extension VerticalSplit {
-    /// Sets the background colour applied to the track / pane chrome.
-    func backgroundColor(_ color: Color) -> Self {
-        var copy = self
-        copy.bgColor = color
-        return copy
-    }
-
-    /// Sets the foreground colour for the collapsed pill text.
-    func handleForegroundColor(_ color: Color) -> Self {
-        var copy = self
-        copy.handleFg = color
-        return copy
     }
 }

@@ -61,7 +61,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = BibleBook.swift;
-			path = Sources/Models/BibleBook.swift;
+			path = BibleBook.swift;
 			sourceTree = <group>;
 		};
 		2DABBCBED3DF4DDDBAFD0174 = {
@@ -70,7 +70,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = text.plist.xml;
 			name = Info.plist;
-			path = Resources/Info.plist;
+			path = Info.plist;
 			sourceTree = <group>;
 		};
 		4D9847953D8C4D52A9DA8F3A = {
@@ -79,7 +79,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = BibleApp.swift;
-			path = Sources/App/BibleApp.swift;
+			path = BibleApp.swift;
 			sourceTree = <group>;
 		};
 		9D138CD05D8D4492B6D826C6 = {
@@ -87,7 +87,7 @@
 			fileEncoding = 4;
 			includeInIndex = 0;
 			isa = PBXFileReference;
-			path = Resources/Assets.xcassets;
+			path = Assets.xcassets;
 			sourceTree = <group>;
 		};
 		A1B2C3D4E5F6A7B8C9D0E1F1 = {
@@ -96,7 +96,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = SplitDetent.swift;
-			path = Sources/Vendor/VerticalSplit/SplitDetent.swift;
+			path = VerticalSplit/SplitDetent.swift;
 			sourceTree = <group>;
 		};
 		A4EA3D613789464AA179D4ED = {
@@ -105,7 +105,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = ContentView.swift;
-			path = Sources/Views/ContentView.swift;
+			path = ContentView.swift;
 			sourceTree = <group>;
 		};
 		B2C3D4E5F6A7B8C9D0E1F2F2 = {
@@ -114,7 +114,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = Helpers.swift;
-			path = Sources/Vendor/VerticalSplit/Helpers.swift;
+			path = VerticalSplit/Helpers.swift;
 			sourceTree = <group>;
 		};
 		C3D4E5F6A7B8C9D0E1F2F3F3 = {
@@ -123,7 +123,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = VerticalSplit.swift;
-			path = Sources/Vendor/VerticalSplit/VerticalSplit.swift;
+			path = VerticalSplit/VerticalSplit.swift;
 			sourceTree = <group>;
 		};
 		C61CAA144D8945BAA586ACD1 = {
@@ -141,7 +141,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = BibleBookTests.swift;
-			path = Tests/BibleBookTests.swift;
+			path = BibleBookTests.swift;
 			sourceTree = <group>;
 		};
 		D7E8F9A0B1C2D3E4F5A6B7C8D9 = {
@@ -159,7 +159,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = BibleVerse.swift;
-			path = Sources/Models/BibleVerse.swift;
+			path = BibleVerse.swift;
 			sourceTree = <group>;
 		};
 		A2B1C3D4E5F6A7B8C9D0E1F2 = {
@@ -168,7 +168,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = BibleAPIService.swift;
-			path = Sources/Services/BibleAPIService.swift;
+			path = BibleAPIService.swift;
 			sourceTree = <group>;
 		};
 		B3C2D1E4F5A6B7C8D9E0F1A2 = {
@@ -177,7 +177,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = BibleAPIServiceTests.swift;
-			path = Tests/BibleAPIServiceTests.swift;
+			path = BibleAPIServiceTests.swift;
 			sourceTree = <group>;
 		};
 /* End PBXFileReference section */
@@ -204,7 +204,7 @@
 			);
 			isa = PBXGroup;
 			name = Views;
-			path = Sources/Views;
+			path = Views;
 			sourceTree = <group>;
 		};
 		45E57433203B4876AC233397 = {
@@ -223,7 +223,7 @@
 			);
 			isa = PBXGroup;
 			name = App;
-			path = Sources/App;
+			path = App;
 			sourceTree = <group>;
 		};
 		6B226792E27148BBB35A5A79 = {
@@ -258,7 +258,7 @@
 			);
 			isa = PBXGroup;
 			name = Vendor;
-			path = Sources/Vendor;
+			path = Vendor;
 			sourceTree = <group>;
 		};
 		C0D1E2F3A4B5C6D7E8F9A0B1C2 = {
@@ -268,7 +268,7 @@
 			);
 			isa = PBXGroup;
 			name = Models;
-			path = Sources/Models;
+			path = Models;
 			sourceTree = <group>;
 		};
 		D4C3B2A1E6F7A8B9C0D1E2F3 = {
@@ -277,7 +277,7 @@
 			);
 			isa = PBXGroup;
 			name = Services;
-			path = Sources/Services;
+			path = Services;
 			sourceTree = <group>;
 		};
 		D2E3F4A5B6C7D8E9F0A1B2C3D4 = {
@@ -329,12 +329,12 @@
 		C7D8E9F0A1B2C3D4E5F6A7B8C9D0 = {
 			isa = PBXTargetDependency;
 			target = F3A4B5C6D7E8F9A0B1C2D3E4;
-			targetProxy = C7D8E9F0A1B2C3D4E5F6A7B8C9D0;
+			targetProxy = C8D9E0F1A2B3C4D5E6F7A8B9;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXContainerItemProxy section */
-		C7D8E9F0A1B2C3D4E5F6A7B8C9D0 = {
+		C8D9E0F1A2B3C4D5E6F7A8B9 = {
 			containerPortal = 910DC7FC3DBC4ACBA7838DF2;
 			isa = PBXContainerItemProxy;
 			proxyType = 1;

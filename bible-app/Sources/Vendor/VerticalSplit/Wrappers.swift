@@ -20,7 +20,8 @@ struct TopWrapper<Content: View, Overlay: View>: View {
     @ViewBuilder var overlay: () -> Overlay
 
     let bottomSafeArea = SafeAreaInsetsKey.defaultValue.bottom
-    let displayCornerRadius = UIScreen.main.displayCornerRadius
+    /// Approximates the device's display corner radius for the pane mask.
+    let displayCornerRadius: CGFloat = 44
     let screenWidth = UIApplication.shared.screenSize.width
 
     var cornerRadius: CGFloat {
@@ -71,7 +72,8 @@ struct BottomWrapper<Content: View, Overlay: View>: View {
     @ViewBuilder var overlay: () -> Overlay
 
     let topSafeArea = SafeAreaInsetsKey.defaultValue.top
-    let displayCornerRadius = UIScreen.main.displayCornerRadius
+    /// Approximates the device's display corner radius for the pane mask.
+    let displayCornerRadius: CGFloat = 44
     let screenWidth = UIApplication.shared.screenSize.width
 
     var cornerRadius: CGFloat {

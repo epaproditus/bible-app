@@ -1,0 +1,25 @@
+## User settings
+xcuserdata/
+
+## Xcode
+*.xcworkspace
+!default.xcworkspace
+build/
+*.build/
+DerivedData/
+
+## Swift Package Manager
+.packages/
+.build/
+
+## CocoaPods
+Pods/
+
+## macOS
+.DS_Store
+
+## App leftovers
+*.app
+*.ipa
+*.dSYM.zip
+*.dSYM

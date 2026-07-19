@@ -1,601 +1,482 @@
 // !$*UTF8*$!
 {
 	archiveVersion = 1;
-	classes = {
-	};
 	objectVersion = 56;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		2E785C62AA674D65B5037D5A = {
-			fileRef = A4EA3D613789464AA179D4ED;
-			isa = PBXBuildFile;
-		};
-		2F3D69AA22B64882A0103831 = {
-			fileRef = 4D9847953D8C4D52A9DA8F3A;
-			isa = PBXBuildFile;
-		};
-		7A1B2C3D4E5F6A7B8C9D0E1F = {
-			fileRef = 1A2B3C4D5E6F7A8B9C0D1E2F;
-			isa = PBXBuildFile;
-		};
-		B84B705705C34003B0CCDFA8 = {
-			fileRef = 9D138CD05D8D4492B6D826C6;
-			isa = PBXBuildFile;
-		};
-		D4E5F6A7B8C9D0E1F2F3F4F4 = {
-			fileRef = A1B2C3D4E5F6A7B8C9D0E1F1;
-			isa = PBXBuildFile;
-		};
-		E2F3A4B5C6D7E8F9A0B1C2D3 = {
-			fileRef = D1E2F3A4B5C6D7E8F9A0B1C2;
-			isa = PBXBuildFile;
-		};
-		E5F6A7B8C9D0E1F2F3F4F5F5 = {
-			fileRef = B2C3D4E5F6A7B8C9D0E1F2F2;
-			isa = PBXBuildFile;
-		};
-		F6A7B8C9D0E1F2F3F4F5F6F6 = {
-			fileRef = C3D4E5F6A7B8C9D0E1F2F3F3;
-			isa = PBXBuildFile;
-		};
-
-		E1D2C3B4A5F6E7D8C9B0A1B2 = {
-			fileRef = F1E2D3C4B5A6F7E8D9C0B1A2;
-			isa = PBXBuildFile;
-		};
-		F2E1D4C3B5A6F7E8D9C0A1B2 = {
-			fileRef = A2B1C3D4E5F6A7B8C9D0E1F2;
-			isa = PBXBuildFile;
-		};
-		A3B4C5D6E7F8A9B0C1D2E3F4 = {
-			fileRef = B3C2D1E4F5A6B7C8D9E0F1A2;
-			isa = PBXBuildFile;
-		};
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
-		1A2B3C4D5E6F7A8B9C0D1E2F = {
-			fileEncoding = 4;
-			includeInIndex = 0;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.swift;
-			name = BibleBook.swift;
-			path = Sources/Models/BibleBook.swift;
-			sourceTree = <group>;
-		};
-		2DABBCBED3DF4DDDBAFD0174 = {
-			fileEncoding = 4;
-			includeInIndex = 0;
-			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
-			name = Info.plist;
-			path = Resources/Info.plist;
-			sourceTree = <group>;
-		};
-		4D9847953D8C4D52A9DA8F3A = {
-			fileEncoding = 4;
-			includeInIndex = 0;
+		9B2521332823437A99D52A22 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = BibleApp.swift;
 			path = Sources/App/BibleApp.swift;
-			sourceTree = <group>;
+			sourceTree = SOURCE_ROOT;
 		};
-		9D138CD05D8D4492B6D826C6 = {
-			explicitFileType = folder.assetcatalog;
-			fileEncoding = 4;
-			includeInIndex = 0;
-			isa = PBXFileReference;
-			path = Resources/Assets.xcassets;
-			sourceTree = <group>;
-		};
-		A1B2C3D4E5F6A7B8C9D0E1F1 = {
-			fileEncoding = 4;
-			includeInIndex = 0;
+		9B2521332823437A99D52A23 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
-			name = SplitDetent.swift;
-			path = Sources/Vendor/VerticalSplit/SplitDetent.swift;
-			sourceTree = <group>;
+			name = BibleBook.swift;
+			path = Sources/Models/BibleBook.swift;
+			sourceTree = SOURCE_ROOT;
 		};
-		A4EA3D613789464AA179D4ED = {
-			fileEncoding = 4;
-			includeInIndex = 0;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.swift;
-			name = ContentView.swift;
-			path = Sources/Views/ContentView.swift;
-			sourceTree = <group>;
-		};
-		B2C3D4E5F6A7B8C9D0E1F2F2 = {
-			fileEncoding = 4;
-			includeInIndex = 0;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.swift;
-			name = Helpers.swift;
-			path = Sources/Vendor/VerticalSplit/Helpers.swift;
-			sourceTree = <group>;
-		};
-		C3D4E5F6A7B8C9D0E1F2F3F3 = {
-			fileEncoding = 4;
-			includeInIndex = 0;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.swift;
-			name = VerticalSplit.swift;
-			path = Sources/Vendor/VerticalSplit/VerticalSplit.swift;
-			sourceTree = <group>;
-		};
-		C61CAA144D8945BAA586ACD1 = {
-			explicitFileType = wrapper.application;
-			fileEncoding = 4;
-			includeInIndex = 0;
-			isa = PBXFileReference;
-			name = "Bible App.app";
-			path = "Bible App.app";
-			sourceTree = "<group>";
-		};
-		D1E2F3A4B5C6D7E8F9A0B1C2 = {
-			fileEncoding = 4;
-			includeInIndex = 0;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.swift;
-			name = BibleBookTests.swift;
-			path = Tests/BibleBookTests.swift;
-			sourceTree = <group>;
-		};
-		D7E8F9A0B1C2D3E4F5A6B7C8D9 = {
-			explicitFileType = wrapper.cfbundle;
-			fileEncoding = 4;
-			includeInIndex = 0;
-			isa = PBXFileReference;
-			path = "Bible App Tests.xctest";
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-
-		F1E2D3C4B5A6F7E8D9C0B1A2 = {
-			fileEncoding = 4;
-			includeInIndex = 0;
+		9B2521332823437A99D52A24 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = BibleVerse.swift;
 			path = Sources/Models/BibleVerse.swift;
-			sourceTree = <group>;
+			sourceTree = SOURCE_ROOT;
 		};
-		A2B1C3D4E5F6A7B8C9D0E1F2 = {
-			fileEncoding = 4;
-			includeInIndex = 0;
+		9B2521332823437A99D52A25 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = BibleAPIService.swift;
 			path = Sources/Services/BibleAPIService.swift;
-			sourceTree = <group>;
+			sourceTree = SOURCE_ROOT;
 		};
-		B3C2D1E4F5A6B7C8D9E0F1A2 = {
-			fileEncoding = 4;
-			includeInIndex = 0;
+		9B2521332823437A99D52A26 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			name = ContentView.swift;
+			path = Sources/Views/ContentView.swift;
+			sourceTree = SOURCE_ROOT;
+		};
+		9B2521332823437A99D52A27 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			name = SplitDetent.swift;
+			path = Sources/Vendor/VerticalSplit/SplitDetent.swift;
+			sourceTree = SOURCE_ROOT;
+		};
+		9B2521332823437A99D52A28 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			name = Helpers.swift;
+			path = Sources/Vendor/VerticalSplit/Helpers.swift;
+			sourceTree = SOURCE_ROOT;
+		};
+		9B2521332823437A99D52A29 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			name = VerticalSplit.swift;
+			path = Sources/Vendor/VerticalSplit/VerticalSplit.swift;
+			sourceTree = SOURCE_ROOT;
+		};
+		9B2521332823437A99D52A2A = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			name = BibleBookTests.swift;
+			path = Tests/BibleBookTests.swift;
+			sourceTree = SOURCE_ROOT;
+		};
+		9B2521332823437A99D52A2B = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			name = BibleAPIServiceTests.swift;
 			path = Tests/BibleAPIServiceTests.swift;
-			sourceTree = <group>;
+			sourceTree = SOURCE_ROOT;
+		};
+		9B2521332823437A99D52A2C = {
+			isa = PBXFileReference;
+			lastKnownFileType = text.plist.utf8;
+			name = Info.plist;
+			path = Resources/Info.plist;
+			sourceTree = SOURCE_ROOT;
+		};
+		9B2521332823437A99D52A2D = {
+			isa = PBXFileReference;
+			explicitFileType = folder.assetcatalog;
+			name = Assets.xcassets;
+			path = Resources/Assets.xcassets;
+			sourceTree = SOURCE_ROOT;
+		};
+		9B2521332823437A99D52A2E = {
+			isa = PBXFileReference;
+			explicitFileType = wrapper.application;
+			name = "Bible App.app";
+			path = "Bible App.app";
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		9B2521332823437A99D52A2F = {
+			isa = PBXFileReference;
+			explicitFileType = wrapper.cfbundle;
+			name = "Bible App Tests.xctest";
+			path = "Bible App Tests.xctest";
+			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXFileReference section */
 
-/* Begin PBXFrameworksBuildPhase section */
-		F3AFFB120AE94E1D8158356D = {
-			buildActionMask = 2147483647;
-			files = ();
-			isa = PBXFrameworksBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
+/* Begin PBXGroup section */
+		9B2521332823437A99D52A30 = {
+			isa = PBXGroup;
+			children = (
+				9B2521332823437A99D52A31,
+				9B2521332823437A99D52A32,
+				9B2521332823437A99D52A33,
+			);
+			sourceTree = "<group>";
+			name = "bible-app";
+			path = "";
 		};
-		B5C6D7E8F9A0B1C2D3E4F5A6 = {
+		9B2521332823437A99D52A31 = {
+			isa = PBXGroup;
+			children = (
+				9B2521332823437A99D52A34,
+				9B2521332823437A99D52A35,
+				9B2521332823437A99D52A36,
+				9B2521332823437A99D52A37,
+				9B2521332823437A99D52A38,
+			);
+			sourceTree = "<group>";
+			name = Sources;
+			path = Sources;
+		};
+		9B2521332823437A99D52A32 = {
+			isa = PBXGroup;
+			children = (
+				9B2521332823437A99D52A2C,
+				9B2521332823437A99D52A2D,
+			);
+			sourceTree = "<group>";
+			name = Resources;
+			path = Resources;
+		};
+		9B2521332823437A99D52A33 = {
+			isa = PBXGroup;
+			children = (
+				9B2521332823437A99D52A2A,
+				9B2521332823437A99D52A2B,
+			);
+			sourceTree = "<group>";
+			name = Tests;
+			path = Tests;
+		};
+		9B2521332823437A99D52A34 = {
+			isa = PBXGroup;
+			children = (
+				9B2521332823437A99D52A39,
+			);
+			sourceTree = "<group>";
+			name = App;
+			path = Sources/App;
+		};
+		9B2521332823437A99D52A35 = {
+			isa = PBXGroup;
+			children = (
+				9B2521332823437A99D52A23,
+				9B2521332823437A99D52A24,
+			);
+			sourceTree = "<group>";
+			name = Models;
+			path = Sources/Models;
+		};
+		9B2521332823437A99D52A36 = {
+			isa = PBXGroup;
+			children = (
+				9B2521332823437A99D52A25,
+			);
+			sourceTree = "<group>";
+			name = Services;
+			path = Sources/Services;
+		};
+		9B2521332823437A99D52A37 = {
+			isa = PBXGroup;
+			children = (
+				9B2521332823437A99D52A26,
+			);
+			sourceTree = "<group>";
+			name = Views;
+			path = Sources/Views;
+		};
+		9B2521332823437A99D52A38 = {
+			isa = PBXGroup;
+			children = (
+				9B2521332823437A99D52A3A,
+			);
+			sourceTree = "<group>";
+			name = Vendor;
+			path = Sources/Vendor;
+		};
+		9B2521332823437A99D52A3A = {
+			isa = PBXGroup;
+			children = (
+				9B2521332823437A99D52A27,
+				9B2521332823437A99D52A28,
+				9B2521332823437A99D52A29,
+			);
+			sourceTree = "<group>";
+			name = VerticalSplit;
+			path = Sources/Vendor/VerticalSplit;
+		};
+		9B2521332823437A99D52A39 = {
+			isa = PBXGroup;
+			children = (
+				9B2521332823437A99D52A22,
+			);
+			sourceTree = "<group>";
+			name = App;
+			path = Sources/App;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXBuildFile section */
+		9B2521332823437A99D52A41 = {
+			isa = PBXBuildFile;
+			fileRef = 9B2521332823437A99D52A22;
+		};
+		9B2521332823437A99D52A42 = {
+			isa = PBXBuildFile;
+			fileRef = 9B2521332823437A99D52A23;
+		};
+		9B2521332823437A99D52A43 = {
+			isa = PBXBuildFile;
+			fileRef = 9B2521332823437A99D52A24;
+		};
+		9B2521332823437A99D52A44 = {
+			isa = PBXBuildFile;
+			fileRef = 9B2521332823437A99D52A25;
+		};
+		9B2521332823437A99D52A45 = {
+			isa = PBXBuildFile;
+			fileRef = 9B2521332823437A99D52A26;
+		};
+		9B2521332823437A99D52A46 = {
+			isa = PBXBuildFile;
+			fileRef = 9B2521332823437A99D52A27;
+		};
+		9B2521332823437A99D52A47 = {
+			isa = PBXBuildFile;
+			fileRef = 9B2521332823437A99D52A28;
+		};
+		9B2521332823437A99D52A48 = {
+			isa = PBXBuildFile;
+			fileRef = 9B2521332823437A99D52A29;
+		};
+		9B2521332823437A99D52A49 = {
+			isa = PBXBuildFile;
+			fileRef = 9B2521332823437A99D52A2A;
+		};
+		9B2521332823437A99D52A4A = {
+			isa = PBXBuildFile;
+			fileRef = 9B2521332823437A99D52A2B;
+		};
+		9B2521332823437A99D52A4B = {
+			isa = PBXBuildFile;
+			fileRef = 9B2521332823437A99D52A2C;
+		};
+		9B2521332823437A99D52A4C = {
+			isa = PBXBuildFile;
+			fileRef = 9B2521332823437A99D52A2D;
+		};
+/* End PBXBuildFile section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9B2521332823437A99D52A4D = {
+			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = ();
-			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
-/* Begin PBXGroup section */
-		314A4EBCC02C42F196B0DF02 = {
-			children = (
-				A4EA3D613789464AA179D4ED,
-			);
-			isa = PBXGroup;
-			name = Views;
-			path = Sources/Views;
-			sourceTree = <group>;
-		};
-		45E57433203B4876AC233397 = {
-			children = (
-				9D138CD05D8D4492B6D826C6,
-				2DABBCBED3DF4DDDBAFD0174,
-			);
-			isa = PBXGroup;
-			name = Resources;
-			path = Resources;
-			sourceTree = <group>;
-		};
-		5D1C14310CE84FAA84939ED4 = {
-			children = (
-				4D9847953D8C4D52A9DA8F3A,
-			);
-			isa = PBXGroup;
-			name = App;
-			path = Sources/App;
-			sourceTree = <group>;
-		};
-		6B226792E27148BBB35A5A79 = {
-			children = (
-				5D1C14310CE84FAA84939ED4,
-				314A4EBCC02C42F196B0DF02,
-				C0D1E2F3A4B5C6D7E8F9A0B1C2,
-				D4C3B2A1E6F7A8B9C0D1E2F3,
-				A7B8C9D0E1F2F3F4F5F6F7F7,
-			);
-			isa = PBXGroup;
-			name = Sources;
-			path = Sources;
-			sourceTree = <group>;
-		};
-		9B2521332823437A99D52A22 = {
-			children = (
-				6B226792E27148BBB35A5A79,
-				45E57433203B4876AC233397,
-				D2E3F4A5B6C7D8E9F0A1B2C3D4,
-			);
-			isa = PBXGroup;
-			name = bible-app;
-			path = ;
-			sourceTree = <group>;
-		};
-		A7B8C9D0E1F2F3F4F5F6F7F7 = {
-			children = (
-				A1B2C3D4E5F6A7B8C9D0E1F1,
-				B2C3D4E5F6A7B8C9D0E1F2F2,
-				C3D4E5F6A7B8C9D0E1F2F3F3,
-			);
-			isa = PBXGroup;
-			name = Vendor;
-			path = Sources/Vendor;
-			sourceTree = <group>;
-		};
-		C0D1E2F3A4B5C6D7E8F9A0B1C2 = {
-			children = (
-				1A2B3C4D5E6F7A8B9C0D1E2F,
-				F1E2D3C4B5A6F7E8D9C0B1A2,
-			);
-			isa = PBXGroup;
-			name = Models;
-			path = Sources/Models;
-			sourceTree = <group>;
-		};
-		D4C3B2A1E6F7A8B9C0D1E2F3 = {
-			children = (
-				A2B1C3D4E5F6A7B8C9D0E1F2,
-			);
-			isa = PBXGroup;
-			name = Services;
-			path = Sources/Services;
-			sourceTree = <group>;
-		};
-		D2E3F4A5B6C7D8E9F0A1B2C3D4 = {
-			children = (
-				D1E2F3A4B5C6D7E8F9A0B1C2,
-				B3C2D1E4F5A6B7C8D9E0F1A2,
-			);
-			isa = PBXGroup;
-			name = Tests;
-			path = Tests;
-			sourceTree = <group>;
-		};
-/* End PBXGroup section */
-
-/* Begin PBXNativeTarget section */
-		AE9E1AD324CE4EE6B1129BB5 = {
-			buildConfigurationList = 32C244BCB9E44BAF923E330F;
-			buildPhases = (
-				30FC2405C5674B3A9BEE938D,
-				F3AFFB120AE94E1D8158356D,
-				262EC60CE5B946B889849D16,
-			);
-			buildRules = ();
-			dependencies = ();
-			isa = PBXNativeTarget;
-			name = bible-app;
-			productName = bible-app;
-			productReference = C61CAA144D8945BAA586ACD1;
-			productType = "com.apple.product-type.application";
-		};
-		F3A4B5C6D7E8F9A0B1C2D3E4 = {
-			buildConfigurationList = E8F9A0B1C2D3E4F5A6B7C8D9;
-			buildPhases = (
-				A4B5C6D7E8F9A0B1C2D3E4F5,
-				B5C6D7E8F9A0B1C2D3E4F5A6,
-				C6D7E8F9A0B1C2D3E4F5A6B7,
-			);
-			buildRules = ();
-			dependencies = ();
-			isa = PBXNativeTarget;
-			name = "Bible App Tests";
-			productName = "Bible App Tests";
-			productReference = D7E8F9A0B1C2D3E4F5A6B7C8D9;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-/* End PBXNativeTarget section */
-
-/* Begin PBXTargetDependency section */
-		C7D8E9F0A1B2C3D4E5F6A7B8C9D0 = {
-			isa = PBXTargetDependency;
-			target = F3A4B5C6D7E8F9A0B1C2D3E4;
-			targetProxy = C7D8E9F0A1B2C3D4E5F6A7B8C9D0;
-		};
-/* End PBXTargetDependency section */
-
-/* Begin PBXContainerItemProxy section */
-		C7D8E9F0A1B2C3D4E5F6A7B8C9D0 = {
-			containerPortal = 910DC7FC3DBC4ACBA7838DF2;
-			isa = PBXContainerItemProxy;
-			proxyType = 1;
-			remoteGlobalIDString = F3A4B5C6D7E8F9A0B1C2D3E4;
-			remoteInfo = "Bible App Tests";
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXProject section */
-		910DC7FC3DBC4ACBA7838DF2 = {
-			attributes = {
-				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
-				TargetAttributes = {
-					AE9E1AD324CE4EE6B1129BB5 = {
-						CreatedOnToolsVersion = 15.0;
-					};
-					F3A4B5C6D7E8F9A0B1C2D3E4 = {
-						CreatedOnToolsVersion = 15.0;
-						TestTargetID = AE9E1AD324CE4EE6B1129BB5;
-					};
-				};
-			};
-			buildConfigurationList = 5558C42F28D648FE9F4E3D8C;
-			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = en;
-			hasScannedForEncodings = 0;
-			isa = PBXProject;
-			knownRegions = (
-				en,
-				Base,
-			);
-			mainGroup = 9B2521332823437A99D52A22;
-			productRefGroup = 9B2521332823437A99D52A22;
-			projectDirPath = "";
-			projectRoot = "";
-			targets = (
-				AE9E1AD324CE4EE6B1129BB5,
-				F3A4B5C6D7E8F9A0B1C2D3E4,
-			);
-		};
-/* End PBXProject section */
-
 /* Begin PBXResourcesBuildPhase section */
-		262EC60CE5B946B889849D16 = {
+		9B2521332823437A99D52A4E = {
+			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B84B705705C34003B0CCDFA8,
+				9B2521332823437A99D52A4B,
+				9B2521332823437A99D52A4C,
 			);
-			isa = PBXResourcesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C6D7E8F9A0B1C2D3E4F5A6B7 = {
-			buildActionMask = 2147483647;
-			files = ();
-			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		30FC2405C5674B3A9BEE938D = {
+		9B2521332823437A99D52A4F = {
+			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7A1B2C3D4E5F6A7B8C9D0E1F,
-				2F3D69AA22B64882A0103831,
-				2E785C62AA674D65B5037D5A,
-				E1D2C3B4A5F6E7D8C9B0A1B2,
-				F2E1D4C3B5A6F7E8D9C0A1B2,
-				D4E5F6A7B8C9D0E1F2F3F4F4,
-				E5F6A7B8C9D0E1F2F3F4F5F5,
-				F6A7B8C9D0E1F2F3F4F5F6F6,
+				9B2521332823437A99D52A41,
+				9B2521332823437A99D52A42,
+				9B2521332823437A99D52A43,
+				9B2521332823437A99D52A44,
+				9B2521332823437A99D52A45,
+				9B2521332823437A99D52A46,
+				9B2521332823437A99D52A47,
+				9B2521332823437A99D52A48,
 			);
-			isa = PBXSourcesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A4B5C6D7E8F9A0B1C2D3E4F5 = {
-			buildActionMask = 2147483647;
-			files = (
-				E2F3A4B5C6D7E8F9A0B1C2D3,
-				A3B4C5D6E7F8A9B0C1D2E3F4,
-			);
-			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXNativeTarget section */
+		9B2521332823437A99D52A50 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B2521332823437A99D52A51;
+			buildPhases = (
+				9B2521332823437A99D52A4F,
+				9B2521332823437A99D52A4D,
+				9B2521332823437A99D52A4E,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = bible-app;
+			productName = bible-app;
+			productReference = 9B2521332823437A99D52A2E;
+			productType = "com.apple.product-type.application";
+		};
+		9B2521332823437A99D52A52 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B2521332823437A99D52A53;
+			buildPhases = (
+				9B2521332823437A99D52A54,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = "Bible App Tests";
+			productName = "Bible App Tests";
+			productReference = 9B2521332823437A99D52A2F;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
 /* Begin XCBuildConfiguration section */
-		530808DA576A469D8488059C = {
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Resources/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Bible App";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "(UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight)";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "(UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight)";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.epaphroditus.bible;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
+		9B2521332823437A99D52A55 = {
 			isa = XCBuildConfiguration;
+			buildSettings = {
+				SWIFT_VERSION = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.epaphrodit.bible-app";
+				INFOPLIST_FILE = Resources/Info.plist;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+			};
 			name = Debug;
 		};
-		A0B1C2D3E4F5A6B7C8D9E0F1 = {
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.epaphroditus.bible.tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bible App.app/Bible App";
-			};
+		9B2521332823437A99D52A56 = {
 			isa = XCBuildConfiguration;
-			name = Debug;
-		};
-		BF2AFA47FB8D49F99DEF3BAA = {
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				SWIFT_VERSION = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.epaphrodit.bible-app";
 				INFOPLIST_FILE = Resources/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Bible App";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "(UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight)";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "(UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight)";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.epaphroditus.bible;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
 			};
-			isa = XCBuildConfiguration;
 			name = Release;
 		};
-		EBA6298901724C5EB35E3256 = {
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = gnu++20;
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf-with-dsym;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_OPTIMIZATION_LEVEL = s;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				VALIDATE_PRODUCT = YES;
-			};
+		9B2521332823437A99D52A57 = {
 			isa = XCBuildConfiguration;
-			name = Release;
-		};
-		F47EA5B6AE1A4157BC96191A = {
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = gnu++20;
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
+				SWIFT_VERSION = 6.0;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				INFOPLIST_FILE = Resources/Info.plist;
 			};
-			isa = XCBuildConfiguration;
 			name = Debug;
 		};
-		F9A0B1C2D3E4F5A6B7C8D9E0 = {
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.epaphroditus.bible.tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bible App.app/Bible App";
-			};
+		9B2521332823437A99D52A58 = {
 			isa = XCBuildConfiguration;
+			buildSettings = {
+				SWIFT_VERSION = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				INFOPLIST_FILE = Resources/Info.plist;
+			};
+			name = Release;
+		};
+		9B2521332823437A99D52A59 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {};
+			name = Debug;
+		};
+		9B2521332823437A99D52A5A = {
+			isa = XCBuildConfiguration;
+			buildSettings = {};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		32C244BCB9E44BAF923E330F = {
-			buildConfigurations = (
-				530808DA576A469D8488059C,
-				BF2AFA47FB8D49F99DEF3BAA,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+		9B2521332823437A99D52A51 = {
 			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B2521332823437A99D52A55,
+				9B2521332823437A99D52A56,
+			);
+			defaultConfigurationName = Release;
 		};
-		5558C42F28D648FE9F4E3D8C = {
-			buildConfigurations = (
-				F47EA5B6AE1A4157BC96191A,
-				EBA6298901724C5EB35E3256,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+		9B2521332823437A99D52A53 = {
 			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B2521332823437A99D52A57,
+				9B2521332823437A99D52A58,
+			);
+			defaultConfigurationName = Release;
 		};
-		E8F9A0B1C2D3E4F5A6B7C8D9 = {
-			buildConfigurations = (
-				A0B1C2D3E4F5A6B7C8D9E0F1,
-				F9A0B1C2D3E4F5A6B7C8D9E0,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+		9B2521332823437A99D52A5B = {
 			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B2521332823437A99D52A59,
+				9B2521332823437A99D52A5A,
+			);
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
-	};
-	rootObject = 910DC7FC3DBC4ACBA7838DF2;
+/* Begin PBXProject section */
+		9B2521332823437A99D52A5C = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					9B2521332823437A99D52A50 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					9B2521332823437A99D52A52 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = 9B2521332823437A99D52A50;
+					};
+				};
+			};
+			buildConfigurationList = 9B2521332823437A99D52A5B;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9B2521332823437A99D52A30;
+			productRefGroup = 9B2521332823437A99D52A30;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9B2521332823437A99D52A50,
+				9B2521332823437A99D52A52,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9B2521332823437A99D52A54 = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B2521332823437A99D52A49,
+				9B2521332823437A99D52A4A,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+	}
+	rootObject = 9B2521332823437A99D52A5C;
 }

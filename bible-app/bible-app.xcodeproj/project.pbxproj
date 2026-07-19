@@ -23,8 +23,20 @@
 			fileRef = 9D138CD05D8D4492B6D826C6;
 			isa = PBXBuildFile;
 		};
+		D4E5F6A7B8C9D0E1F2F3F4F4 = {
+			fileRef = A1B2C3D4E5F6A7B8C9D0E1F1;
+			isa = PBXBuildFile;
+		};
 		E2F3A4B5C6D7E8F9A0B1C2D3 = {
 			fileRef = D1E2F3A4B5C6D7E8F9A0B1C2;
+			isa = PBXBuildFile;
+		};
+		E5F6A7B8C9D0E1F2F3F4F5F5 = {
+			fileRef = B2C3D4E5F6A7B8C9D0E1F2F2;
+			isa = PBXBuildFile;
+		};
+		F6A7B8C9D0E1F2F3F4F5F6F6 = {
+			fileRef = C3D4E5F6A7B8C9D0E1F2F3F3;
 			isa = PBXBuildFile;
 		};
 /* End PBXBuildFile section */
@@ -65,6 +77,15 @@
 			path = Resources/Assets.xcassets;
 			sourceTree = <group>;
 		};
+		A1B2C3D4E5F6A7B8C9D0E1F1 = {
+			fileEncoding = 4;
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			name = SplitDetent.swift;
+			path = Sources/Vendor/VerticalSplit/SplitDetent.swift;
+			sourceTree = <group>;
+		};
 		A4EA3D613789464AA179D4ED = {
 			fileEncoding = 4;
 			includeInIndex = 0;
@@ -72,6 +93,24 @@
 			lastKnownFileType = sourcecode.swift;
 			name = ContentView.swift;
 			path = Sources/Views/ContentView.swift;
+			sourceTree = <group>;
+		};
+		B2C3D4E5F6A7B8C9D0E1F2F2 = {
+			fileEncoding = 4;
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			name = Helpers.swift;
+			path = Sources/Vendor/VerticalSplit/Helpers.swift;
+			sourceTree = <group>;
+		};
+		C3D4E5F6A7B8C9D0E1F2F3F3 = {
+			fileEncoding = 4;
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			name = VerticalSplit.swift;
+			path = Sources/Vendor/VerticalSplit/VerticalSplit.swift;
 			sourceTree = <group>;
 		};
 		C61CAA144D8945BAA586ACD1 = {
@@ -151,6 +190,7 @@
 				5D1C14310CE84FAA84939ED4,
 				314A4EBCC02C42F196B0DF02,
 				C0D1E2F3A4B5C6D7E8F9A0B1C2,
+				A7B8C9D0E1F2F3F4F5F6F7F7,
 			);
 			isa = PBXGroup;
 			name = Sources;
@@ -166,6 +206,17 @@
 			isa = PBXGroup;
 			name = bible-app;
 			path = ;
+			sourceTree = <group>;
+		};
+		A7B8C9D0E1F2F3F4F5F6F7F7 = {
+			children = (
+				A1B2C3D4E5F6A7B8C9D0E1F1,
+				B2C3D4E5F6A7B8C9D0E1F2F2,
+				C3D4E5F6A7B8C9D0E1F2F3F3,
+			);
+			isa = PBXGroup;
+			name = Vendor;
+			path = Sources/Vendor;
 			sourceTree = <group>;
 		};
 		C0D1E2F3A4B5C6D7E8F9A0B1C2 = {
@@ -299,6 +350,9 @@
 				7A1B2C3D4E5F6A7B8C9D0E1F,
 				2F3D69AA22B64882A0103831,
 				2E785C62AA674D65B5037D5A,
+				D4E5F6A7B8C9D0E1F2F3F4F4,
+				E5F6A7B8C9D0E1F2F3F4F5F5,
+				F6A7B8C9D0E1F2F3F4F5F6F6,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;

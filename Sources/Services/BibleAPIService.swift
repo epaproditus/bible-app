@@ -23,16 +23,7 @@ enum BibleAPIService {
     /// Fetch a single footnote by its id within a book.
     static func footnote(id: String, in bookCode: String) -> BibleFootnote? {
         guard let content = getContent(for: bookCode) else { return nil }
-        guard let fn = content.footnotes[id] else { return nil }
-        return BibleFootnote(
-            id: fn.id,
-            bookCode: bookCode,
-            chapter: 0,
-            verse: 0,
-            marker: fn.marker,
-            text: fn.paragraphs.first ?? fn.text,
-            crossReferences: fn.references
-        )
+        return content.footnotes[id]
     }
 
     /// Fetch all footnotes for a given verse.

@@ -370,7 +370,7 @@ public struct VerticalSplit<TopView: View, BottomView: View>: View {
             .zIndex(12)
             .allowsHitTesting(false)
         }
-        .background(Color(.systemBackground))
+        .background(Color.black)
         .onAppear {
             applyDetent(detent)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {

@@ -56,6 +56,7 @@ struct TopWrapper<Content: View, Overlay: View>: View {
                 .fill(bgColor)
                 .padding(.top, -200)
         }
+        .shadow(color: .black.opacity(0.15), radius: 12, x: 0, y: 4)
         .scaleEffect(isFull ? 1 : 1 + min(0, overscroll / 800), anchor: isFull ? .center : .bottom)
         .ignoresSafeArea()
     }
@@ -108,6 +109,7 @@ struct BottomWrapper<Content: View, Overlay: View>: View {
                 .fill(bgColor)
                 .padding(.bottom, -200)
         }
+        .shadow(color: .black.opacity(0.15), radius: 12, x: 0, y: -4)
         .scaleEffect(isFull ? 1 : 1 - max(0, overscroll / 800), anchor: isFull ? .center : .top)
         .ignoresSafeArea()
     }

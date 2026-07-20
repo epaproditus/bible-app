@@ -24,6 +24,7 @@ targets:
       - Sources/Vendor/VerticalSplit
     resources:
       - Resources/Assets.xcassets
+      - Resources/BibleData
     settings:
       base:
         INFOPLIST_FILE: Resources/Info.plist

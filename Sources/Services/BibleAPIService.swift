@@ -1,174 +1,189 @@
 import Foundation
 
-/// Client for the LSM Text Only Holy Bible Recovery Version API.
-///
-/// Uses Basic Authentication (app ID + token) and returns verses parsed from
-/// the JSON endpoint. The API caps requests at 50 verses per call.
-///
-/// **Usage:**
-/// ```swift
-/// let service = BibleAPIService(appID: "myApp", token: "abc123")
-/// let (verses, copyright) = try await service.fetchChapter(book: "Gen.", chapter: 1)
-/// let (verses, copyright) = try await service.fetchVerses("Prov. 29:18; Acts 26:19")
-/// ```
-public actor BibleAPIService {
+/// Service that loads and caches Recovery Version Bible content
+/// from per-book JSON files bundled with the app.
+@MainActor
+enum BibleAPIService {
 
-    // MARK: - Configuration
+    // MARK: - Cache
 
-    private let baseURL = URL(string: "https://api.lsm.org/recver/txo.php")!
-    private let session: URLSession
-    private let appID: String
-    private let token: String
-
-    /// Maximum verses the LSM API returns per request (documented cap).
-    nonisolated static let maxVersesPerRequest = 50
-
-    // MARK: - Init
-
-    public init(
-        appID: String,
-        token: String,
-        session: URLSession = .shared
-    ) {
-        self.appID = appID
-        self.token = token
-        self.session = session
-    }
+    private static var cache: [String: BookContent] = [:]
 
     // MARK: - Public API
 
-    /// Fetch all verses for a single chapter.
-    ///
-    /// - Parameters:
-    ///   - abbreviation: LSM book abbreviation with period, e.g. `"Gen."`, `"Matt."`, `"Rev."`
-    ///   - chapter: Chapter number (1-based)
-    /// - Returns: Tuple of parsed `[Verse]` and the required `copyright` attribution string.
-    /// - Throws: `LSMAPIError` on network/auth/parse failures or if the result exceeds the 50-verse cap.
-    public func fetchChapter(book abbreviation: String, chapter: Int) async throws -> (verses: [Verse], copyright: String) {
-        // Build a reference like "Gen. 1" to fetch the entire chapter
-        let reference = "\(abbreviation) \(chapter)"
-        return try await fetchVerses(reference)
+    /// Fetch verses for a given book and chapter.
+    /// Returns an empty array if the book/chapter isn't found.
+    static func verses(for bookCode: String, chapter: Int) -> [BibleVerse] {
+        guard let content = getContent(for: bookCode) else { return [] }
+        let chKey = "\(chapter)"
+        guard let rawVerses = content.verses[chKey] else { return [] }
+        return rawVerses
     }
 
-    /// Fetch verses from a semicolon-separated reference string.
-    ///
-    /// Supports both standard and complex references, e.g.:
-    /// `"Prov. 29:18; Acts 26:19"`
-    /// `"John 1:1-5"`
-    /// `"Eph. 4:4-6; Rev. 21:2, 9-10"`
-    ///
-    /// - Parameter reference: A semicolon-separated list of Bible references.
-    /// - Returns: Tuple of parsed `[Verse]` and the required `copyright` attribution string.
-    /// - Throws: `LSMAPIError` on network/auth/parse failures or if the result exceeds the 50-verse cap.
-    public func fetchVerses(_ reference: String) async throws -> (verses: [Verse], copyright: String) {
-        let request = try buildRequest(for: reference)
+    /// Fetch a single footnote by its id within a book.
+    static func footnote(id: String, in bookCode: String) -> BibleFootnote? {
+        guard let content = getContent(for: bookCode) else { return nil }
+        guard let fn = content.footnotes[id] else { return nil }
+        return BibleFootnote(
+            id: fn.id,
+            bookCode: bookCode,
+            chapter: 0,
+            verse: 0,
+            marker: fn.marker,
+            text: fn.paragraphs.first ?? fn.text,
+            crossReferences: fn.references
+        )
+    }
 
-        let (data, response): (Data, URLResponse)
+    /// Fetch all footnotes for a given verse.
+    static func footnotes(for bookCode: String, chapter: Int, verse: Int) -> [BibleFootnote] {
+        let verseList = verses(for: bookCode, chapter: chapter)
+        guard let target = verseList.first(where: { $0.verse == verse }) else { return [] }
+
+        return target.footnoteMarkers.compactMap { marker in
+            footnote(id: marker.footnoteID, in: bookCode)
+        }
+    }
+
+    /// Return the LSM copyright attribution string.
+    static func copyright(for bookCode: String) -> String {
+        guard let content = getContent(for: bookCode),
+              !content.copyright.isEmpty
+        else {
+            return "Recovery Version. \u{00A9} 2025 Living Stream Ministry. Used by permission."
+        }
+        return content.copyright
+    }
+
+    /// Preload a book's content into cache.
+    static func preload(bookCode: String) {
+        _ = getContent(for: bookCode)
+    }
+
+    // MARK: - Loading
+
+    private static func getContent(for bookCode: String) -> BookContent? {
+        if let cached = cache[bookCode] { return cached }
+
+        // Try subdirectory "BibleData/books/" first (folder reference),
+        // then flat bundle
+        let primary = Bundle.main.url(
+            forResource: bookCode,
+            withExtension: "json",
+            subdirectory: "BibleData/books"
+        )
+        let fallback = Bundle.main.url(
+            forResource: bookCode,
+            withExtension: "json"
+        )
+        guard let url = primary ?? fallback else {
+            print("[BibleAPIService] Missing resource: BibleData/books/\(bookCode).json")
+            return nil
+        }
+
         do {
-            (data, response) = try await session.data(for: request)
+            let data = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            let raw = try decoder.decode(RawBookContent.self, from: data)
+            let content = BookContent(
+                verses: raw.verses,
+                footnotes: raw.footnotes,
+                copyright: raw.copyright
+            )
+            cache[bookCode] = content
+            return content
         } catch {
-            throw LSMAPIError.networkError(error.localizedDescription)
+            print("[BibleAPIService] Failed to load \(bookCode): \(error)")
+            return nil
         }
-
-        return try parseResponse(data: data, response: response)
     }
 
-    // MARK: - Request Building
-
-    private func buildRequest(for reference: String) throws -> URLRequest {
-        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
-            throw LSMAPIError.invalidResponse
-        }
-
-        components.queryItems = [
-            URLQueryItem(name: "String", value: reference),
-            URLQueryItem(name: "Out", value: "json"),
-            URLQueryItem(name: "Lang", value: "eng"),
-        ]
-
-        guard let url = components.url else {
-            throw LSMAPIError.invalidResponse
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-
-        // Basic Auth: "Basic base64(appid:token)"
-        let credentials = "\(appID):\(token)"
-        guard let credentialData = credentials.data(using: .utf8) else {
-            throw LSMAPIError.authenticationFailed
-        }
-        let base64Credentials = credentialData.base64EncodedString()
-        request.setValue("Basic \(base64Credentials)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        request.timeoutInterval = 30
-        return request
-    }
-
-    // MARK: - Response Parsing
-
-    private func parseResponse(data: Data, response: URLResponse) throws -> (verses: [Verse], copyright: String) {
-        // Check HTTP status
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw LSMAPIError.invalidResponse
-        }
-
-        switch httpResponse.statusCode {
-        case 200:
-            break // OK
-        case 401:
-            throw LSMAPIError.authenticationFailed
-        case 403:
-            throw LSMAPIError.authenticationFailed
-        default:
-            throw LSMAPIError.networkError("HTTP \(httpResponse.statusCode)")
-        }
-
-        // Decode JSON
-        let decoder = JSONDecoder()
-        let lsmResponse: LSMResponse
-        do {
-            lsmResponse = try decoder.decode(LSMResponse.self, from: data)
-        } catch {
-            throw LSMAPIError.decodingError(error.localizedDescription)
-        }
-
-        // Check for API-level error messages
-        if !lsmResponse.message.isEmpty {
-            // If it's a warning about verse count, surface the cap warning
-            if lsmResponse.message.localizedCaseInsensitiveContains("50") ||
-                lsmResponse.message.localizedCaseInsensitiveContains("limit") ||
-                lsmResponse.message.localizedCaseInsensitiveContains("maximum") {
-                throw LSMAPIError.verseLimitExceeded(count: lsmResponse.verses.count)
-            }
-            // Otherwise surface the message
-            throw LSMAPIError.apiError(lsmResponse.message)
-        }
-
-        // Check verse count cap
-        if lsmResponse.verses.count > Self.maxVersesPerRequest {
-            throw LSMAPIError.verseLimitExceeded(count: lsmResponse.verses.count)
-        }
-
-        let verses = lsmResponse.verses.map { raw in
-            Verse(ref: raw.ref, text: raw.text, urlpfx: raw.urlpfx)
-        }
-
-        return (verses, lsmResponse.copyright)
+    /// Clear the memory cache (e.g. on memory warning).
+    static func clearCache() {
+        cache.removeAll()
     }
 }
 
-// MARK: - URLSession Helpers
+// MARK: - Internal types (mirrors the JSON structure)
 
-extension BibleAPIService {
-    /// Create a service with a custom URLSession configuration.
-    /// Useful for injecting mock URLProtocols in tests.
-    nonisolated static func createForTesting(
-        appID: String = "test",
-        token: String = "test",
-        session: URLSession
-    ) -> BibleAPIService {
-        BibleAPIService(appID: appID, token: token, session: session)
+private struct RawBookContent: Decodable {
+    let verses: [String: [RawVerse]]
+    let footnotes: [String: RawFootnote]
+    let copyright: String?
+
+    enum CodingKeys: String, CodingKey {
+        case verses, footnotes, copyright
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        verses = try container.decode([String: [RawVerse]].self, forKey: .verses)
+        footnotes = try container.decode([String: RawFootnote].self, forKey: .footnotes)
+        copyright = try container.decodeIfPresent(String.self, forKey: .copyright)
+    }
+}
+
+private struct RawVerse: Decodable {
+    let verse: Int
+    let text: String
+    let footnoteMarkers: [RawFootnoteMarker]
+}
+
+private struct RawFootnoteMarker: Decodable {
+    let marker: String
+    let footnoteId: String
+
+    enum CodingKeys: String, CodingKey {
+        case marker
+        case footnoteId
+    }
+}
+
+private struct RawFootnote: Decodable {
+    let id: String
+    let marker: String
+    let lemma: String
+    let references: [String]
+    let text: String
+    let paragraphs: [String]
+}
+
+private struct BookContent {
+    let verses: [String: [BibleVerse]]
+    let footnotes: [String: BibleFootnote]
+    let copyright: String
+
+    init(verses: [String: [RawVerse]], footnotes: [String: RawFootnote], copyright: String?) {
+        var vDict: [String: [BibleVerse]] = [:]
+        for (chKey, rawVerses) in verses {
+            vDict[chKey] = rawVerses.map { raw in
+                BibleVerse(
+                    id: "\(chKey)_\(raw.verse)",
+                    bookCode: "",
+                    chapter: Int(chKey) ?? 0,
+                    verse: raw.verse,
+                    text: raw.text,
+                    footnoteMarkers: raw.footnoteMarkers.map { m in
+                        FootnoteMarker(marker: m.marker, footnoteID: m.footnoteId)
+                    }
+                )
+            }
+        }
+        self.verses = vDict
+
+        var fnDict: [String: BibleFootnote] = [:]
+        for (fnId, raw) in footnotes {
+            fnDict[fnId] = BibleFootnote(
+                id: raw.id,
+                bookCode: "",
+                chapter: 0,
+                verse: 0,
+                marker: raw.marker,
+                text: raw.paragraphs.first ?? raw.text,
+                crossReferences: raw.references
+            )
+        }
+        self.footnotes = fnDict
+        self.copyright = copyright ?? "Recovery Version. \u{00A9} 2025 Living Stream Ministry. Used by permission."
     }
 }

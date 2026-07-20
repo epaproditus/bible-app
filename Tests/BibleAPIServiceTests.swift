@@ -1,446 +1,207 @@
 import XCTest
 @testable import bible_app
 
-// MARK: - Mock URLProtocol
-
-/// URLProtocol subclass that intercepts requests and returns canned data.
-/// Used to test BibleAPIService without hitting the real LSM API.
-final class MockURLProtocol: URLProtocol {
-    nonisolated(unsafe) static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
-
-    override class func canInit(with request: URLRequest) -> Bool {
-        true
-    }
-
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-        request
-    }
-
-    override func startLoading() {
-        guard let handler = Self.requestHandler else {
-            XCTFail("No requestHandler set on MockURLProtocol")
-            return
-        }
-
-        do {
-            let (response, data) = try handler(request)
-            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-            client?.urlProtocol(self, didLoad: data)
-            client?.urlProtocolDidFinishLoading(self)
-        } catch {
-            client?.urlProtocol(self, didFailWithError: error)
-        }
-    }
-
-    override func stopLoading() {}
-}
-
-// MARK: - Test Helpers
-
-func makeMockSession() -> URLSession {
-    let config = URLSessionConfiguration.ephemeral
-    config.protocolClasses = [MockURLProtocol.self]
-    return URLSession(configuration: config)
-}
-
-// MARK: - Tests
-
 final class BibleAPIServiceTests: XCTestCase {
 
-    // MARK: - fetchChapter
-
-    func test_fetchChapter_returnsAllVersesForChapter() async throws {
-        let session = makeMockSession()
-        let jsonData = """
-        {
-            "inputstring": "Matt. 1",
-            "detected": "Matt. 1",
-            "verses": [
-                {"ref": "Matt. 1:1", "text": "The book of the generation of Jesus Christ, the son of David, the son of Abraham.", "urlpfx": "Matt/1/1"},
-                {"ref": "Matt. 1:2", "text": "Abraham begot Isaac, and Isaac begot Jacob, and Jacob begot Judah and his brothers,", "urlpfx": "Matt/1/2"}
-            ],
-            "message": "",
-            "copyright": "Verses accessed from the Holy Bible Recovery Version (c) 2024 Living Stream Ministry"
-        }
-        """.data(using: .utf8)!
-
-        MockURLProtocol.requestHandler = { request in
-            let response = HTTPURLResponse(
-                url: request.url!,
-                statusCode: 200,
-                httpVersion: "HTTP/1.1",
-                headerFields: ["Content-Type": "application/json"]
-            )!
-            return (response, jsonData)
-        }
-
-        let service = BibleAPIService.createForTesting(session: session)
-        let (verses, copyright) = try await service.fetchChapter(book: "Matt.", chapter: 1)
-
-        XCTAssertEqual(verses.count, 2, "Should return 2 verses for Matt. 1")
-        XCTAssertEqual(verses[0].ref, "Matt. 1:1")
-        XCTAssertEqual(verses[0].text, "The book of the generation of Jesus Christ, the son of David, the son of Abraham.")
-        XCTAssertEqual(verses[0].urlpfx, "Matt/1/1")
-        XCTAssertEqual(verses[1].ref, "Matt. 1:2")
-        XCTAssertEqual(copyright, "Verses accessed from the Holy Bible Recovery Version (c) 2024 Living Stream Ministry")
+    override func setUp() {
+        super.setUp()
+        BibleAPIService.clearCache()
     }
 
-    // MARK: - fetchVerses with semicolon-separated references
+    // MARK: - Loading
 
-    func test_fetchVerses_withSemicolonSeparatedRefs() async throws {
-        let session = makeMockSession()
-        let jsonData = """
-        {
-            "inputstring": "Prov. 29:18; Acts 26:19",
-            "detected": "Prov. 29:18; Acts 26:19",
-            "verses": [
-                {"ref": "Prov. 29:18", "text": "Where there is no vision, the people cast off restraint; But happy is he who keeps the law.", "urlpfx": "Prov/29/18"},
-                {"ref": "Acts 26:19", "text": "Therefore, King Agrippa, I was not disobedient to the heavenly vision,", "urlpfx": "Acts/26/19"}
-            ],
-            "message": "",
-            "copyright": "Verses accessed from the Holy Bible Recovery Version (c) 2024 Living Stream Ministry"
-        }
-        """.data(using: .utf8)!
-
-        MockURLProtocol.requestHandler = { request in
-            let response = HTTPURLResponse(
-                url: request.url!,
-                statusCode: 200,
-                httpVersion: "HTTP/1.1",
-                headerFields: ["Content-Type": "application/json"]
-            )!
-            return (response, jsonData)
-        }
-
-        let service = BibleAPIService.createForTesting(session: session)
-        let (verses, _) = try await service.fetchVerses("Prov. 29:18; Acts 26:19")
-
-        XCTAssertEqual(verses.count, 2)
-        XCTAssertEqual(verses[0].ref, "Prov. 29:18")
-        XCTAssertEqual(verses[1].ref, "Acts 26:19")
+    func test_loadsGenesisChapter1_has31Verses() {
+        let verses = BibleAPIService.verses(for: "Gen", chapter: 1)
+        XCTAssertEqual(verses.count, 31, "Genesis 1 should have 31 verses")
     }
 
-    // MARK: - 50-verse cap warning
-
-    func test_fetchVerses_warnsWhenExceeding50Verses() async throws {
-        let session = makeMockSession()
-
-        // Build a response with 51 verses — exceeds the documented cap
-        var versesArray: [[String: String]] = []
-        for i in 1...51 {
-            versesArray.append([
-                "ref": "Psa. \(i):1",
-                "text": "Verse \(i)",
-                "urlpfx": "Psa/\(i)/1"
-            ])
-        }
-        let jsonData = try JSONSerialization.data(withJSONObject: [
-            "inputstring": "Psa. 1-150",
-            "detected": "Psa. 1-150",
-            "verses": versesArray,
-            "message": "",
-            "copyright": "(c) 2024 LSM"
-        ])
-
-        MockURLProtocol.requestHandler = { request in
-            let response = HTTPURLResponse(
-                url: request.url!,
-                statusCode: 200,
-                httpVersion: "HTTP/1.1",
-                headerFields: ["Content-Type": "application/json"]
-            )!
-            return (response, jsonData)
-        }
-
-        let service = BibleAPIService.createForTesting(session: session)
-
-        do {
-            _ = try await service.fetchVerses("Psa. 1")
-            XCTFail("Expected verseLimitExceeded error")
-        } catch let error as LSMAPIError {
-            switch error {
-            case .verseLimitExceeded(let count):
-                XCTAssertEqual(count, 51, "Should report 51 verses exceeded")
-            default:
-                XCTFail("Expected verseLimitExceeded, got \(error)")
-            }
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
+    func test_verses_areInCanonicalOrder() {
+        let verses = BibleAPIService.verses(for: "Gen", chapter: 1)
+        let verseNumbers = verses.map(\.verse)
+        XCTAssertEqual(verseNumbers, Array(1...31), "Verses must be in order 1-31")
     }
 
-    // MARK: - API-level message surfaced
-
-    func test_fetchVerses_surfacesAPIMessage() async throws {
-        let session = makeMockSession()
-        let jsonData = """
-        {
-            "inputstring": "Bad Ref",
-            "detected": "",
-            "verses": [],
-            "message": "Error: The input could not be understood.",
-            "copyright": ""
-        }
-        """.data(using: .utf8)!
-
-        MockURLProtocol.requestHandler = { request in
-            let response = HTTPURLResponse(
-                url: request.url!,
-                statusCode: 200,
-                httpVersion: "HTTP/1.1",
-                headerFields: ["Content-Type": "application/json"]
-            )!
-            return (response, jsonData)
-        }
-
-        let service = BibleAPIService.createForTesting(session: session)
-
-        do {
-            _ = try await service.fetchVerses("Bad Ref")
-            XCTFail("Expected apiError")
-        } catch let error as LSMAPIError {
-            switch error {
-            case .apiError(let msg):
-                XCTAssertTrue(msg.contains("could not be understood"))
-            default:
-                XCTFail("Expected apiError, got \(error)")
-            }
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
+    func test_genesis1_1_hasCorrectText() {
+        let verses = BibleAPIService.verses(for: "Gen", chapter: 1)
+        let gen1_1 = verses.first
+        XCTAssertNotNil(gen1_1)
+        XCTAssertEqual(gen1_1?.verse, 1)
+        XCTAssertTrue(gen1_1!.text.contains("beginning"), "Gen 1:1 should contain 'beginning'")
     }
 
-    // MARK: - Authentication failure (401)
-
-    func test_fetchVerses_authenticationFailure_401() async throws {
-        let session = makeMockSession()
-
-        MockURLProtocol.requestHandler = { request in
-            let response = HTTPURLResponse(
-                url: request.url!,
-                statusCode: 401,
-                httpVersion: "HTTP/1.1",
-                headerFields: ["Content-Type": "application/json"]
-            )!
-            return (response, Data())
-        }
-
-        let service = BibleAPIService.createForTesting(session: session)
-
-        do {
-            _ = try await service.fetchVerses("Gen. 1:1")
-            XCTFail("Expected authenticationFailed")
-        } catch let error as LSMAPIError {
-            XCTAssertEqual(error, .authenticationFailed)
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
+    func test_genesis1_31_hasCorrectVerseNumber() {
+        let verses = BibleAPIService.verses(for: "Gen", chapter: 1)
+        let last = verses.last
+        XCTAssertNotNil(last)
+        XCTAssertEqual(last?.verse, 31, "Last verse of Genesis 1 should be verse 31")
     }
 
-    // MARK: - Authentication failure (403)
+    // MARK: - Multi-chapter books
 
-    func test_fetchVerses_authenticationFailure_403() async throws {
-        let session = makeMockSession()
-
-        MockURLProtocol.requestHandler = { request in
-            let response = HTTPURLResponse(
-                url: request.url!,
-                statusCode: 403,
-                httpVersion: "HTTP/1.1",
-                headerFields: ["Content-Type": "application/json"]
-            )!
-            return (response, Data())
-        }
-
-        let service = BibleAPIService.createForTesting(session: session)
-
-        do {
-            _ = try await service.fetchVerses("Gen. 1:1")
-            XCTFail("Expected authenticationFailed")
-        } catch let error as LSMAPIError {
-            XCTAssertEqual(error, .authenticationFailed)
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
+    func test_revelation22_has21Verses() {
+        let verses = BibleAPIService.verses(for: "Rev", chapter: 22)
+        XCTAssertEqual(verses.count, 21, "Revelation 22 should have 21 verses")
     }
 
-    // MARK: - Network error handling
-
-    func test_fetchVerses_networkError() async throws {
-        let session = makeMockSession()
-
-        MockURLProtocol.requestHandler = { _ in
-            throw URLError(.notConnectedToInternet)
-        }
-
-        let service = BibleAPIService.createForTesting(session: session)
-
-        do {
-            _ = try await service.fetchVerses("Gen. 1:1")
-            XCTFail("Expected networkError")
-        } catch let error as LSMAPIError {
-            switch error {
-            case .networkError:
-                break // Expected
-            default:
-                XCTFail("Expected networkError, got \(error)")
-            }
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
+    func test_psalms1_has6Verses() {
+        let verses = BibleAPIService.verses(for: "Psa", chapter: 1)
+        XCTAssertEqual(verses.count, 6, "Psalm 1 should have 6 verses")
     }
 
-    // MARK: - Copyright attribution surfaced
+    func test_psalms150_has6Verses() {
+        let verses = BibleAPIService.verses(for: "Psa", chapter: 150)
+        XCTAssertEqual(verses.count, 6, "Psalm 150 should have 6 verses")
+    }
 
-    func test_fetchVerses_copyrightAttributionReturned() async throws {
-        let session = makeMockSession()
-        let jsonData = """
-        {
-            "inputstring": "John 3:16",
-            "detected": "John 3:16",
-            "verses": [
-                {"ref": "John 3:16", "text": "For God so loved the world that He gave His only begotten Son...", "urlpfx": "John/3/16"}
-            ],
-            "message": "",
-            "copyright": "Verses accessed from the Holy Bible Recovery Version (c) 2024 Living Stream Ministry"
-        }
-        """.data(using: .utf8)!
+    func test_matthew1_has25Verses() {
+        let verses = BibleAPIService.verses(for: "Mat", chapter: 1)
+        XCTAssertEqual(verses.count, 25, "Matthew 1 should have 25 verses")
+    }
 
-        MockURLProtocol.requestHandler = { request in
-            let response = HTTPURLResponse(
-                url: request.url!,
-                statusCode: 200,
-                httpVersion: "HTTP/1.1",
-                headerFields: ["Content-Type": "application/json"]
-            )!
-            return (response, jsonData)
-        }
+    func test_matthew28_has20Verses() {
+        let verses = BibleAPIService.verses(for: "Mat", chapter: 28)
+        XCTAssertEqual(verses.count, 20, "Matthew 28 should have 20 verses")
+    }
 
-        let service = BibleAPIService.createForTesting(session: session)
-        let (_, copyright) = try await service.fetchVerses("John 3:16")
+    func test_john3_has36Verses() {
+        let verses = BibleAPIService.verses(for: "Joh", chapter: 3)
+        XCTAssertEqual(verses.count, 36, "John 3 should have 36 verses")
+    }
 
-        XCTAssertFalse(copyright.isEmpty, "Copyright attribution must not be empty")
+    func test_john1_has51Verses() {
+        let verses = BibleAPIService.verses(for: "Joh", chapter: 1)
+        XCTAssertEqual(verses.count, 51, "John 1 should have 51 verses")
+    }
+
+    // MARK: - Single-chapter books
+
+    func test_obadiah1_has21Verses() {
+        let verses = BibleAPIService.verses(for: "Oba", chapter: 1)
+        XCTAssertEqual(verses.count, 21, "Obadiah should have 21 verses")
+    }
+
+    func test_philemon1_has25Verses() {
+        let verses = BibleAPIService.verses(for: "Phm", chapter: 1)
+        XCTAssertEqual(verses.count, 25, "Philemon should have 25 verses")
+    }
+
+    func test_2john1_has13Verses() {
+        let verses = BibleAPIService.verses(for: "2Jo", chapter: 1)
+        XCTAssertEqual(verses.count, 13, "2 John should have 13 verses")
+    }
+
+    func test_3john1_has14Verses() {
+        let verses = BibleAPIService.verses(for: "3Jo", chapter: 1)
+        XCTAssertEqual(verses.count, 14, "3 John should have 14 verses")
+    }
+
+    func test_jude1_has25Verses() {
+        let verses = BibleAPIService.verses(for: "Jud", chapter: 1)
+        XCTAssertEqual(verses.count, 25, "Jude should have 25 verses")
+    }
+
+    // MARK: - Missing data
+
+    func test_unknownBookCode_returnsEmpty() {
+        let verses = BibleAPIService.verses(for: "NONEXISTENT", chapter: 1)
+        XCTAssertTrue(verses.isEmpty, "Unknown book code should return empty array")
+    }
+
+    func test_unknownChapter_returnsEmpty() {
+        let verses = BibleAPIService.verses(for: "Gen", chapter: 999)
+        XCTAssertTrue(verses.isEmpty, "Unknown chapter should return empty array")
+    }
+
+    // MARK: - Cache
+
+    func test_cache_returnsSameResults() {
+        let first = BibleAPIService.verses(for: "Gen", chapter: 1)
+        let second = BibleAPIService.verses(for: "Gen", chapter: 1)
+        XCTAssertEqual(first.count, second.count)
+        XCTAssertEqual(first.first?.text, second.first?.text)
+    }
+
+    func test_clearCache_forcesReload() {
+        let verses = BibleAPIService.verses(for: "Gen", chapter: 1)
+        XCTAssertFalse(verses.isEmpty)
+
+        BibleAPIService.clearCache()
+        let reloaded = BibleAPIService.verses(for: "Gen", chapter: 1)
+        XCTAssertEqual(reloaded.count, verses.count)
+    }
+
+    // MARK: - Footnotes
+
+    func test_verse_footnoteMarkers_areNotEmpty() {
+        // Genesis 1:1 is known to have footnote markers
+        let verses = BibleAPIService.verses(for: "Gen", chapter: 1)
+        let gen1_1 = verses.first
+        XCTAssertNotNil(gen1_1)
+        XCTAssertFalse(gen1_1!.footnoteMarkers.isEmpty, "Gen 1:1 should have footnote markers")
+    }
+
+    func test_footnoteLookup_returnsFootnote() {
+        let fn = BibleAPIService.footnote(id: "n1_1x1a", in: "Gen")
+        XCTAssertNotNil(fn, "Footnote n1_1x1a should exist in Genesis")
+        XCTAssertEqual(fn?.marker, "1a")
+        XCTAssertFalse(fn!.text.isEmpty, "Footnote text should not be empty")
+    }
+
+    func test_footnotesForVerse_returnsExpectedCount() {
+        let fns = BibleAPIService.footnotes(for: "Gen", chapter: 1, verse: 1)
+        XCTAssertFalse(fns.isEmpty, "Gen 1:1 should have footnotes")
+    }
+
+    func test_unknownFootnote_returnsNil() {
+        let fn = BibleAPIService.footnote(id: "nonexistent", in: "Gen")
+        XCTAssertNil(fn)
+    }
+
+    // MARK: - Copyright
+
+    func test_copyright_returnsNonEmpty() {
+        let copyright = BibleAPIService.copyright(for: "Gen")
+        XCTAssertFalse(copyright.isEmpty, "Copyright should not be empty")
         XCTAssertTrue(copyright.contains("Living Stream Ministry"), "Copyright must reference LSM")
     }
 
-    // MARK: - Basic Auth header present
-
-    func test_service_sendsBasicAuthHeader() async throws {
-        let session = makeMockSession()
-        let expectation = expectation(description: "Request made")
-
-        MockURLProtocol.requestHandler = { request in
-            let authHeader = request.value(forHTTPHeaderField: "Authorization")
-            XCTAssertNotNil(authHeader, "Authorization header must be present")
-            XCTAssertTrue(authHeader!.hasPrefix("Basic "), "Must use Basic auth scheme")
-
-            // Verify base64 encoding of "test:test"
-            let expectedBase64 = Data("test:test".utf8).base64EncodedString()
-            XCTAssertEqual(authHeader, "Basic \(expectedBase64)")
-
-            expectation.fulfill()
-
-            let response = HTTPURLResponse(
-                url: request.url!,
-                statusCode: 200,
-                httpVersion: "HTTP/1.1",
-                headerFields: ["Content-Type": "application/json"]
-            )!
-            let data = """
-            {"inputstring":"","detected":"","verses":[],"message":"","copyright":""}
-            """.data(using: .utf8)!
-            return (response, data)
-        }
-
-        let service = BibleAPIService.createForTesting(appID: "test", token: "test", session: session)
-        _ = try? await service.fetchVerses("Gen. 1:1")
-
-        await fulfillment(of: [expectation], timeout: 1.0)
+    func test_copyright_fallback() {
+        let copyright = BibleAPIService.copyright(for: "NONEXISTENT")
+        XCTAssertFalse(copyright.isEmpty, "Fallback copyright should not be empty")
     }
 
-    // MARK: - Accept header is JSON
+    // MARK: - Preload
 
-    func test_service_sendsAcceptJsonHeader() async throws {
-        let session = makeMockSession()
-
-        MockURLProtocol.requestHandler = { request in
-            let acceptHeader = request.value(forHTTPHeaderField: "Accept")
-            XCTAssertEqual(acceptHeader, "application/json", "Must request JSON responses")
-
-            let response = HTTPURLResponse(
-                url: request.url!,
-                statusCode: 200,
-                httpVersion: "HTTP/1.1",
-                headerFields: ["Content-Type": "application/json"]
-            )!
-            let data = """
-            {"inputstring":"","detected":"","verses":[],"message":"","copyright":""}
-            """.data(using: .utf8)!
-            return (response, data)
-        }
-
-        let service = BibleAPIService.createForTesting(session: session)
-        _ = try? await service.fetchVerses("Gen. 1:1")
+    func test_preload_doesNotThrow() {
+        // Should not crash
+        BibleAPIService.preload(bookCode: "Gen")
+        BibleAPIService.preload(bookCode: "Rev")
+        // Verify it was cached
+        let verses = BibleAPIService.verses(for: "Gen", chapter: 1)
+        XCTAssertEqual(verses.count, 31)
     }
 
-    // MARK: - JSON decoding error
+    // MARK: - All 66 books load without error
 
-    func test_fetchVerses_decodingErrorOnBadJSON() async throws {
-        let session = makeMockSession()
-        let badData = "not valid json".data(using: .utf8)!
-
-        MockURLProtocol.requestHandler = { request in
-            let response = HTTPURLResponse(
-                url: request.url!,
-                statusCode: 200,
-                httpVersion: "HTTP/1.1",
-                headerFields: ["Content-Type": "application/json"]
-            )!
-            return (response, badData)
-        }
-
-        let service = BibleAPIService.createForTesting(session: session)
-
-        do {
-            _ = try await service.fetchVerses("Gen. 1:1")
-            XCTFail("Expected decodingError")
-        } catch let error as LSMAPIError {
-            switch error {
-            case .decodingError:
-                break // Expected
-            default:
-                XCTFail("Expected decodingError, got \(error)")
-            }
-        } catch {
-            XCTFail("Unexpected error: \(error)")
+    func test_allBooks_loadSuccessfully() {
+        let codes = BibleDataService.books.map(\.code)
+        for code in codes {
+            let verses = BibleAPIService.verses(for: code, chapter: 1)
+            XCTAssertFalse(verses.isEmpty, "\(code) chapter 1 should load verses")
         }
     }
 
-    // MARK: - LSMResponse models
+    // MARK: - Verse ID Format
 
-    func test_LSMResponse_decodesCorrectly() throws {
-        let json = """
-        {
-            "inputstring": "John 1:1",
-            "detected": "John 1:1",
-            "verses": [
-                {"ref": "John 1:1", "text": "In the beginning was the Word...", "urlpfx": "John/1/1"}
-            ],
-            "message": "",
-            "copyright": "(c) 2024 LSM"
-        }
-        """.data(using: .utf8)!
+    func test_verseID_format() {
+        let verses = BibleAPIService.verses(for: "Gen", chapter: 1)
+        let gen1_1 = verses.first
+        XCTAssertEqual(gen1_1?.id, "1_1", "Verse ID should be chapter_verse format")
+    }
 
-        let decoder = JSONDecoder()
-        let response = try decoder.decode(LSMResponse.self, from: json)
-
-        XCTAssertEqual(response.inputstring, "John 1:1")
-        XCTAssertEqual(response.detected, "John 1:1")
-        XCTAssertEqual(response.verses.count, 1)
-        XCTAssertEqual(response.verses[0].ref, "John 1:1")
-        XCTAssertEqual(response.verses[0].text, "In the beginning was the Word...")
-        XCTAssertEqual(response.verses[0].urlpfx, "John/1/1")
-        XCTAssertEqual(response.copyright, "(c) 2024 LSM")
-        XCTAssertTrue(response.message.isEmpty)
+    func test_genesis1_verseCountMatchesSource() {
+        // The source HTML data for the Recovery Version Genesis 1 has 31 verses
+        let verses = BibleAPIService.verses(for: "Gen", chapter: 1)
+        XCTAssertEqual(verses.count, 31, "Genesis 1 must have 31 verses matching the source HTML data")
     }
 }

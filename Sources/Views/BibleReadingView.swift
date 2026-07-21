@@ -9,7 +9,7 @@ struct BibleReadingView: View {
     @State private var selectedFootnote: BibleFootnote?
     @State private var expandedVerse: Int?
     @State private var isLoading = true
-    @State private var splitDetent: SplitDetent = .footnotesExpanded
+    @State private var splitDetent: SplitDetent = .topFull
 
     var body: some View {
         VerticalSplit(
@@ -27,23 +27,19 @@ struct BibleReadingView: View {
                 selectedFootnote: $selectedFootnote
             )
         } bottomView: {
-            if let fn = selectedFootnote {
-                FootnotePanel(
-                    footnote: fn,
-                    onDismiss: {
-                        withAnimation(.spring(response: 0.35)) {
-                            selectedFootnote = nil
-                        }
-                    }
-                )
-                .transition(.opacity)
-            } else {
-                FootnotesPlaceholder()
-            }
+            FootnotesPlaceholder()
         }
         .background(Color(.systemBackground))
         .navigationTitle(book.name)
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $selectedFootnote) { fn in
+            NavigationStack {
+                FootnotePanel(footnote: fn, onDismiss: {
+                    selectedFootnote = nil
+                })
+                .navigationBarTitleDisplayMode(.inline)
+            }
+        }
         .task {
             isLoading = true
             BibleAPIService.preload(bookCode: book.code)
@@ -156,7 +152,6 @@ private struct VerseRow: View {
                     .font(.system(size: 15, weight: .regular, design: .rounded))
                     .foregroundStyle(.primary)
                     .lineSpacing(4)
-                    .fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled)
             }
             .padding(.vertical, 6)

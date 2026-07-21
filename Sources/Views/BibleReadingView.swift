@@ -9,7 +9,7 @@ struct BibleReadingView: View {
     @State private var selectedFootnote: BibleFootnote?
     @State private var expandedVerse: Int?
     @State private var isLoading = true
-    @State private var splitDetent: SplitDetent = .topFull
+    @State private var splitDetent: SplitDetent = .footnotesExpanded
 
     var body: some View {
         VerticalSplit(

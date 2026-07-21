@@ -27,19 +27,23 @@ struct BibleReadingView: View {
                 selectedFootnote: $selectedFootnote
             )
         } bottomView: {
-            FootnotesPlaceholder()
+            if let fn = selectedFootnote {
+                FootnotePanel(
+                    footnote: fn,
+                    onDismiss: {
+                        withAnimation(.spring(response: 0.35)) {
+                            selectedFootnote = nil
+                        }
+                    }
+                )
+                .transition(.opacity)
+            } else {
+                FootnotesPlaceholder()
+            }
         }
         .background(Color(.systemBackground))
         .navigationTitle(book.name)
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(item: $selectedFootnote) { fn in
-            NavigationStack {
-                FootnotePanel(footnote: fn, onDismiss: {
-                    selectedFootnote = nil
-                })
-                .navigationBarTitleDisplayMode(.inline)
-            }
-        }
         .task {
             isLoading = true
             BibleAPIService.preload(bookCode: book.code)
@@ -152,6 +156,7 @@ private struct VerseRow: View {
                     .font(.system(size: 15, weight: .regular, design: .rounded))
                     .foregroundStyle(.primary)
                     .lineSpacing(4)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .textSelection(.enabled)
             }
             .padding(.vertical, 6)

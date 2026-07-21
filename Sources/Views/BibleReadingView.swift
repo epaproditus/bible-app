@@ -152,7 +152,7 @@ private struct VerseRow: View {
                     .foregroundStyle(Color.accentColor)
                     .frame(width: 24, alignment: .trailing)
 
-                Text(verseTextWithMarkers)
+                verseTextWithMarkers
                     .font(.system(size: 15, weight: .regular, design: .rounded))
                     .foregroundStyle(.primary)
                     .lineSpacing(4)

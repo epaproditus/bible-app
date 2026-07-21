@@ -23,7 +23,16 @@ enum BibleAPIService {
     /// Fetch a single footnote by its id within a book.
     static func footnote(id: String, in bookCode: String) -> BibleFootnote? {
         guard let content = getContent(for: bookCode) else { return nil }
-        return content.footnotes[id]
+        guard let fn = content.rawFootnotes[id] else { return nil }
+        return BibleFootnote(
+            id: fn.id,
+            bookCode: bookCode,
+            chapter: 0,
+            verse: 0,
+            marker: fn.marker,
+            text: fn.paragraphs.first ?? fn.text,
+            crossReferences: fn.references
+        )
     }
 
     /// Fetch all footnotes for a given verse.
@@ -142,6 +151,7 @@ private struct RawFootnote: Decodable {
 private struct BookContent {
     let verses: [String: [BibleVerse]]
     let footnotes: [String: BibleFootnote]
+    let rawFootnotes: [String: RawFootnote]
     let copyright: String
 
     init(verses: [String: [RawVerse]], footnotes: [String: RawFootnote], copyright: String?) {
@@ -175,6 +185,7 @@ private struct BookContent {
             )
         }
         self.footnotes = fnDict
+        self.rawFootnotes = footnotes
         self.copyright = copyright ?? "Recovery Version. \u{00A9} 2025 Living Stream Ministry. Used by permission."
     }
 }
